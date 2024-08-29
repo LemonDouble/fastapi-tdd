@@ -21,3 +21,24 @@ def test_model_structure_column_data_types(db_inspector):
     assert isinstance(columns["is_active"]["type"], Boolean)
     assert isinstance(columns["level"]["type"], Integer)
     assert isinstance(columns["parent_id"]["type"], Integer)
+
+
+def test_model_structure_nullable_constraints(db_inspector):
+    """
+    테이블의 Nullable, Non-Nullable 필드가 정상 설정되어 있는지 테스트
+    """
+    table = "category"
+    columns = db_inspector.get_columns(table)
+
+    expected_nullable = {
+        "id":        False,
+        "name":      False,
+        "slug":      False,
+        "is_active": False,
+        "level":     False,
+        "parent_id": True,
+    }
+
+    for column in columns:
+        column_name = column["name"]
+        assert column["nullable"] == expected_nullable.get(column_name), f"column {column_name} is not as null expected"
