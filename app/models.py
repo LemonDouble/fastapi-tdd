@@ -75,3 +75,20 @@ class ProductLine(Base):
         UniqueConstraint("sku", name="uq_product_line_sku"),
         UniqueConstraint("order", "product_id", name="uq_product_line_order_product_id"),
     )
+
+
+class ProductImage(Base):
+    __tablename__ = "product_image"
+
+    id = Column(Integer, primary_key=True)
+    alternative_text = Column(String(100), nullable=False)
+    url = Column(String(100), nullable=False)
+    order = Column(Integer, nullable=False)
+    product_line_id = Column(Integer, ForeignKey("product_line.id"), nullable=False, )
+
+    __table_args__ = (
+        CheckConstraint('"order" >= 1 AND "order" <= 20', name="product_image_order_range"),
+        CheckConstraint("LENGTH(alternative_text) > 0", name="product_image_alternative_length_check"),
+        CheckConstraint("LENGTH(url) > 0", name="product_image_url_length_check"),
+        UniqueConstraint("order", "product_line_id", name="uq_product_image_order_product_line_id"),
+    )
