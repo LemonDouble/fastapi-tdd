@@ -64,3 +64,15 @@ def test_model_structure_default_values(db_inspector):
 
     assert columns["is_active"]["default"] == "false"
     assert columns["level"]["default"] == "100"
+
+
+def test_model_structure_column_lengths(db_inspector):
+    """
+    테이블의 길이 제한이 잘 적용되어 있는지 확인
+    """
+
+    table = "category"
+    columns = {columns["name"]: columns for columns in db_inspector.get_columns(table)}
+
+    assert columns["name"]["type"].length == 100
+    assert columns["slug"]["type"].length == 120
