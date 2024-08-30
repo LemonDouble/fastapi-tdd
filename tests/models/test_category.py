@@ -42,3 +42,14 @@ def test_model_structure_nullable_constraints(db_inspector):
     for column in columns:
         column_name = column["name"]
         assert column["nullable"] == expected_nullable.get(column_name), f"column {column_name} is not as null expected"
+
+
+def test_model_structure_column_constraints(db_inspector):
+    """
+    테이블의 Constraints 설정이 정상 설정되어 있는지 테스트
+    """
+    table = "category"
+    constraints = db_inspector.get_check_constraints(table)
+
+    assert any(constraint["name"] == "name_length_check" for constraint in constraints)
+    assert any(constraint["name"] == "slug_length_check" for constraint in constraints)
