@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, DateTime, Enum, Float, Integer, Numeric, String, Text, UUID
+from sqlalchemy import Boolean, DateTime, Float, Integer, Numeric, UUID
 
 
 def test_model_structure_table_exists(db_inspector):
