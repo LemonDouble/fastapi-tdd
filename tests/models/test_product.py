@@ -36,18 +36,18 @@ def test_model_structure_nullable_constraints(db_inspector):
     table = "product"
     columns = db_inspector.get_columns(table)
 
-    expected_nullable = {"id":             False,
-                         "pid":            False,
-                         "name":           False,
-                         "slug":           False,
-                         "description":    True,
-                         "is_digital":     False,
-                         "created_at":     False,
-                         "updated_at":     False,
-                         "is_active":      False,
-                         "stock_status":   False,
-                         "category_id":    False,
-                         "seasonal_id": True,
+    expected_nullable = {"id":           False,
+                         "pid":          False,
+                         "name":         False,
+                         "slug":         False,
+                         "description":  True,
+                         "is_digital":   False,
+                         "created_at":   False,
+                         "updated_at":   False,
+                         "is_active":    False,
+                         "stock_status": False,
+                         "category_id":  False,
+                         "seasonal_id":  True,
                          }
 
     for column in columns:
@@ -97,5 +97,20 @@ def test_model_structure_unique_constraints(db_inspector):
     table = "product"
     constraints = db_inspector.get_unique_constraints(table)
 
+    assert any(constraint["name"] == "uq_product_pid" for constraint in constraints)
     assert any(constraint["name"] == "uq_product_name" for constraint in constraints)
     assert any(constraint["name"] == "uq_product_slug" for constraint in constraints)
+
+
+def test_model_structure_foreign_key(db_inspector):
+    """
+    테이블의 FK가 잘 설정되어 있는지 확인
+    """
+    table = "product"
+    foreign_keys = db_inspector.get_foreign_keys(table)
+
+    category_foreign_key = next((fk for fk in foreign_keys if fk["constrained_columns"] == ["category_id"]), None)
+    seasonal_foreign_key = next((fk for fk in foreign_keys if fk["constrained_columns"] == ["seasonal_id"]), None)
+
+    assert category_foreign_key is not None
+    assert seasonal_foreign_key is not None

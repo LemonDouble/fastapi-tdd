@@ -87,3 +87,15 @@ def test_model_structure_unique_constraints(db_inspector):
 
     assert any(constraint["name"] == "uq_category_name_level" for constraint in constraints)
     assert any(constraint["name"] == "uq_category_slug" for constraint in constraints)
+
+
+def test_model_structure_foreign_key(db_inspector):
+    """
+    테이블의 FK가 잘 설정되어 있는지 확인
+    """
+    table = "category"
+    foreign_keys = db_inspector.get_foreign_keys(table)
+
+    parent_foreign_key = next((fk for fk in foreign_keys if fk["constrained_columns"] == ["parent_id"]), None)
+
+    assert parent_foreign_key is not None
