@@ -63,6 +63,7 @@ class SeasonalEvent(Base):
         UniqueConstraint("name", name="uq_seasonal_event_name"),
     )
 
+
 class ProductLine(Base):
     __tablename__ = "product_line"
 
@@ -98,4 +99,17 @@ class ProductImage(Base):
         CheckConstraint("LENGTH(alternative_text) > 0", name="product_image_alternative_length_check"),
         CheckConstraint("LENGTH(url) > 0", name="product_image_url_length_check"),
         UniqueConstraint("order", "product_line_id", name="uq_product_image_order_product_line_id"),
+    )
+
+
+class Attribute(Base):
+    __tablename__ = "attribute"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    description = Column(String(100), nullable=True)
+
+    __table_args__ = (
+        CheckConstraint("LENGTH(name) > 0", name="attribute_name_length_check"),
+        UniqueConstraint("name", name="uq_attribute_name"),
     )
