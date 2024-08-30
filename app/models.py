@@ -9,8 +9,8 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     slug = Column(String(120), nullable=False)
-    is_active = Column(Boolean, nullable=False)
-    level = Column(Integer, nullable=False)
+    is_active = Column(Boolean, nullable=False, default=False, server_default="false")
+    level = Column(Integer, nullable=False, default=100, server_default="100")
     parent_id = Column(Integer, nullable=True)
 
     __table_args__ = (
