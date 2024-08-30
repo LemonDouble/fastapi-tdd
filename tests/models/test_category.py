@@ -76,3 +76,14 @@ def test_model_structure_column_lengths(db_inspector):
 
     assert columns["name"]["type"].length == 100
     assert columns["slug"]["type"].length == 120
+
+
+def test_model_structure_unique_constraints(db_inspector):
+    """
+    테이블의 Unique Constrints가 잘 적용되어 있는지 확인
+    """
+    table = "category"
+    constraints = db_inspector.get_unique_constraints(table)
+
+    assert any(constraint["name"] == "uq_category_name_level" for constraint in constraints)
+    assert any(constraint["name"] == "uq_category_slug" for constraint in constraints)
