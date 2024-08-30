@@ -1,5 +1,6 @@
 import sqlalchemy
-from sqlalchemy import Boolean, CheckConstraint, Column, DateTime, Enum, ForeignKey, Integer, String, Text, \
+from sqlalchemy import Boolean, CheckConstraint, Column, DECIMAL, DateTime, Enum, Float, ForeignKey, Integer, String, \
+    Text, \
     UUID, UniqueConstraint, text
 
 from app.db_connection import Base
@@ -27,7 +28,7 @@ class Product(Base):
     __tablename__ = "product"
 
     id = Column(Integer, primary_key=True)
-    pid = Column(UUID(as_uuid=True), unique=True, nullable=False, server_default=text("uuid_generate_v4()"))
+    pid = Column(UUID(as_uuid=True), nullable=False, server_default=text("uuid_generate_v4()"))
     name = Column(String(200), nullable=False)
     slug = Column(String(220), nullable=False)
     description = Column(Text, nullable=True)
@@ -43,6 +44,7 @@ class Product(Base):
     __table_args__ = (
         CheckConstraint("LENGTH(name) > 0", name="product_name_length_check"),
         CheckConstraint("LENGTH(slug) > 0", name="product_slug_length_check"),
+        UniqueConstraint("pid", name="uq_product_pid"),
         UniqueConstraint("name", name="uq_product_name"),
         UniqueConstraint("slug", name="uq_product_slug"),
     )
@@ -52,3 +54,24 @@ class SeasonalEvent(Base):
     __tablename__ = "seasonal_event"
 
     id = Column(Integer, primary_key=True)
+
+
+class ProductLine(Base):
+    __tablename__ = "product_line"
+
+    id = Column(Integer, primary_key=True)
+    price = Column(DECIMAL(5, 2), nullable=False)
+    sku = Column(UUID(as_uuid=True), nullable=False, server_default=text("uuid_generate_v4()"))
+    stock_qty = Column(Integer, nullable=False, default=0, server_default="0")
+    is_active = Column(Boolean, nullable=False, default=False, server_default="false")
+    order = Column(Integer, nullable=False)
+    weight = Column(Float, nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"), )
+    product_id = Column(Integer, ForeignKey("product.id"), nullable=False, )
+
+    __table_args__ = (
+        CheckConstraint("price >= 0 AND price <= 999.99", name="product_line_check_price"),
+        CheckConstraint('"order" >= 1 AND "order" <= 20', name="product_line_order_range"),
+        UniqueConstraint("sku", name="uq_product_line_sku"),
+        UniqueConstraint("order", "product_id", name="uq_product_line_order_product_id"),
+    )
