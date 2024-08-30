@@ -54,7 +54,14 @@ class SeasonalEvent(Base):
     __tablename__ = "seasonal_event"
 
     id = Column(Integer, primary_key=True)
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
+    name = Column(String(100), nullable=False)
 
+    __table_args__ = (
+        CheckConstraint("LENGTH(name) > 0", name="seasonal_event_name_length_check"),
+        UniqueConstraint("name", name="uq_seasonal_event_name"),
+    )
 
 class ProductLine(Base):
     __tablename__ = "product_line"
