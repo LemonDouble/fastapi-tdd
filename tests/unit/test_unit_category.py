@@ -1,4 +1,5 @@
 import pytest
+from fastapi import HTTPException
 from pydantic import ValidationError
 
 from app.models import Category
@@ -42,3 +43,25 @@ def test_unit_create_new_category_successfully(client, monkeypatch):
 
     assert response.status_code == 201
     assert response.json() == category
+
+
+@pytest.mark.parametrize("existing_category, category_data, expected_detail", [
+    (True, get_random_category_dict(), "Category with this name and level exists"),
+    (True, get_random_category_dict(), "Category with this slug exists"),
+])
+def test_unit_create_new_category_existing(client, monkeypatch, existing_category, category_data, expected_detail):
+    def mock_check_existing_category(db, category_data):
+        if existing_category:
+            raise HTTPException(status_code=400, detail=expected_detail)
+
+    monkeypatch.setattr("app.routers.category_routes.check_existing_category", mock_check_existing_category)
+    monkeypatch.setattr("sqlalchemy.orm.Query.first", mock_output())
+
+    body = category_data.copy()
+    body.pop("id")
+    response = client.post("api/category", json=body)
+
+    assert response.status_code == 400
+
+    if expected_detail:
+        assert response.json() == {"detail": expected_detail}
