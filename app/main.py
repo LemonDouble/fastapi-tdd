@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
+from app.routers import category_routes
 import logging.config
 
 logging.config.fileConfig("logging.config", disable_existing_loggers=False)
@@ -6,10 +7,4 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-@app.get("/")
-def test():
-    try:
-        result = 1 / 0
-    except Exception as e:
-        logger.error(f"Error occurred: {e}")
-        raise HTTPException(status_code=500, detail=f"Error occurred: {e}")
+app.include_router(category_routes.router, prefix="/api/category", tags=["Category"])
