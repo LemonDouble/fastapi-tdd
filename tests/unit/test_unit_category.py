@@ -31,6 +31,9 @@ def test_unit_schema_category_validation():
 
 
 def test_unit_create_new_category_successfully(client, monkeypatch):
+    """
+    Valid한 데이터의 경우 카테고리 생성 성공 테스트
+    """
     category = get_random_category_dict()
 
     for key, value in category.items():
@@ -58,6 +61,10 @@ def test_unit_create_new_category_successfully(client, monkeypatch):
 def test_unit_create_new_category_existing(
     client, monkeypatch, existing_category, category_data, expected_detail
 ):
+    """
+    중복 데이터가 있는 경우 Exception 발생 테스트
+    """
+
     def mock_check_existing_category(db, category_data):
         if existing_category:
             raise HTTPException(status_code=400, detail=expected_detail)
@@ -79,6 +86,9 @@ def test_unit_create_new_category_existing(
 
 
 def test_unit_create_new_category_with_internal_server_error(client, monkeypatch):
+    """
+    DB 에러 등으로 예상치 못한 에러 발생시, 정상적으로 에러 핸들링하는지 테스트
+    """
     category = get_random_category_dict()
 
     def mock_create_category_exception(*args, **kwargs):
