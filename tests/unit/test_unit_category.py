@@ -11,6 +11,46 @@ def mock_output(return_value=None):
     return lambda *args, **kwargs: return_value
 
 
+def test_unit_get_all_categories_successful(client, monkeypatch):
+    """
+    카테고리 전체 조회 정상 동작 테스트
+    """
+    categories = [get_random_category_dict(i) for i in range(5)]
+    monkeypatch.setattr("sqlalchemy.orm.Query.all", mock_output(categories))
+
+    response = client.get("api/category/")
+
+    assert response.status_code == 200
+    assert response.json() == categories
+
+
+def test_unit_get_all_categories_returns_empty(client, monkeypatch):
+    """
+    카테고리가 없는 경우 빈 리스트 리턴 테스트
+    """
+    categories = []
+    monkeypatch.setattr("sqlalchemy.orm.Query.all", mock_output(categories))
+
+    response = client.get("api/category/")
+
+    assert response.status_code == 200
+    assert response.json() == categories
+
+
+def test_unit_get_all_categories_internal_server_error(client, monkeypatch):
+    """
+    DB 에러 등으로 예상치 못한 에러 발생시, 정상적으로 에러 핸들링하는지 테스트
+    """
+
+    def mock_get_all_categories_exception(*args, **kwargs):
+        raise Exception("Internal Server Error")
+
+    monkeypatch.setattr("sqlalchemy.orm.Query.all", mock_get_all_categories_exception)
+    response = client.get("api/category")
+
+    assert response.status_code == 500
+
+
 def test_unit_schema_category_validation():
     """
     스키마가 Valid한 경우와 Invalid한 경우에 대해 스키마 테스트
