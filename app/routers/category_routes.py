@@ -12,10 +12,11 @@ from app.utils.category_utils import check_existing_category
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+
 @router.post("/", response_model=CategoryReturn, status_code=HTTPStatus.CREATED)
-def create_category(category_data : CategoryCreate, db : Session =  Depends(get_db_session)):
-
-
+def create_category(
+    category_data: CategoryCreate, db: Session = Depends(get_db_session)
+):
     try:
         check_existing_category(db=db, category_data=category_data)
         new_category = Category(**category_data.model_dump())

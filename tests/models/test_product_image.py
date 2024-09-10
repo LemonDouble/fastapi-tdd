@@ -29,16 +29,19 @@ def test_model_structure_nullable_constraints(db_inspector):
     table = "product_image"
     columns = db_inspector.get_columns(table)
 
-    expected_nullable = {"id":               False,
-                         "alternative_text": False,
-                         "url":              False,
-                         "order":            False,
-                         "product_line_id":  False,
-                         }
+    expected_nullable = {
+        "id": False,
+        "alternative_text": False,
+        "url": False,
+        "order": False,
+        "product_line_id": False,
+    }
 
     for column in columns:
         column_name = column["name"]
-        assert column["nullable"] == expected_nullable.get(column_name), f"column {column_name} is not as null expected"
+        assert column["nullable"] == expected_nullable.get(
+            column_name
+        ), f"column {column_name} is not as null expected"
 
 
 def test_model_structure_column_constraints(db_inspector):
@@ -48,9 +51,17 @@ def test_model_structure_column_constraints(db_inspector):
     table = "product_image"
     constraints = db_inspector.get_check_constraints(table)
 
-    assert any(constraint["name"] == "product_image_order_range" for constraint in constraints)
-    assert any(constraint["name"] == "product_image_alternative_length_check" for constraint in constraints)
-    assert any(constraint["name"] == "product_image_url_length_check" for constraint in constraints)
+    assert any(
+        constraint["name"] == "product_image_order_range" for constraint in constraints
+    )
+    assert any(
+        constraint["name"] == "product_image_alternative_length_check"
+        for constraint in constraints
+    )
+    assert any(
+        constraint["name"] == "product_image_url_length_check"
+        for constraint in constraints
+    )
 
 
 def test_model_structure_unique_constraints(db_inspector):
@@ -60,7 +71,10 @@ def test_model_structure_unique_constraints(db_inspector):
     table = "product_image"
     constraints = db_inspector.get_unique_constraints(table)
 
-    assert any(constraint["name"] == "uq_product_image_order_product_line_id" for constraint in constraints)
+    assert any(
+        constraint["name"] == "uq_product_image_order_product_line_id"
+        for constraint in constraints
+    )
 
 
 def test_model_structure_column_lengths(db_inspector):
@@ -82,7 +96,9 @@ def test_model_structure_foreign_key(db_inspector):
     table = "product_image"
     foreign_keys = db_inspector.get_foreign_keys(table)
 
-    product_line_foreign_key = next((fk for fk in foreign_keys if fk["constrained_columns"] == ["product_line_id"]),
-                                    None)
+    product_line_foreign_key = next(
+        (fk for fk in foreign_keys if fk["constrained_columns"] == ["product_line_id"]),
+        None,
+    )
 
     assert product_line_foreign_key is not None

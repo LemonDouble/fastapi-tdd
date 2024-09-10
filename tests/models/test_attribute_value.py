@@ -28,14 +28,16 @@ def test_model_structure_nullable_constraints(db_inspector):
     columns = db_inspector.get_columns(table)
 
     expected_nullable = {
-        "id":              False,
+        "id": False,
         "attribute_value": False,
-        "attribute_id":    False,
+        "attribute_id": False,
     }
 
     for column in columns:
         column_name = column["name"]
-        assert column["nullable"] == expected_nullable.get(column_name), f"column {column_name} is not as null expected"
+        assert column["nullable"] == expected_nullable.get(
+            column_name
+        ), f"column {column_name} is not as null expected"
 
 
 def test_model_structure_column_constraints(db_inspector):
@@ -45,7 +47,10 @@ def test_model_structure_column_constraints(db_inspector):
     table = "attribute_value"
     constraints = db_inspector.get_check_constraints(table)
 
-    assert any(constraint["name"] == "attribute_value_value_length_check" for constraint in constraints)
+    assert any(
+        constraint["name"] == "attribute_value_value_length_check"
+        for constraint in constraints
+    )
 
 
 def test_model_structure_column_lengths(db_inspector):
@@ -66,7 +71,10 @@ def test_model_structure_unique_constraints(db_inspector):
     table = "attribute_value"
     constraints = db_inspector.get_unique_constraints(table)
 
-    assert any(constraint["name"] == "uq_attribute_value_attribute_id" for constraint in constraints)
+    assert any(
+        constraint["name"] == "uq_attribute_value_attribute_id"
+        for constraint in constraints
+    )
 
 
 def test_model_structure_foreign_key(db_inspector):
@@ -76,7 +84,9 @@ def test_model_structure_foreign_key(db_inspector):
     table = "attribute_value"
     foreign_keys = db_inspector.get_foreign_keys(table)
 
-    attribute_value_foreign_key = next((fk for fk in foreign_keys if fk["constrained_columns"] == ["attribute_id"]),
-                                       None)
+    attribute_value_foreign_key = next(
+        (fk for fk in foreign_keys if fk["constrained_columns"] == ["attribute_id"]),
+        None,
+    )
 
     assert attribute_value_foreign_key is not None

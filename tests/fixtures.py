@@ -9,6 +9,7 @@ from tests.utils.database_utils import migrate_to_db
 from tests.utils.docker_utils import start_database_container
 from app.main import app
 
+
 @pytest.fixture(scope="session")
 def db_session():
     container = start_database_container()
@@ -25,6 +26,7 @@ def db_session():
     container.stop()
     container.remove()
     engine.dispose()
+
 
 @pytest.fixture(scope="function")
 def client():

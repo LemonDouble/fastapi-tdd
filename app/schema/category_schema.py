@@ -16,4 +16,4 @@ class CategoryCreate(CategoryBase):
 
 
 class CategoryReturn(CategoryBase):
-    id : int
+    id: int

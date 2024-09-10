@@ -28,15 +28,18 @@ def test_model_structure_nullable_constraints(db_inspector):
     table = "seasonal_event"
     columns = db_inspector.get_columns(table)
 
-    expected_nullable = {"id":         False,
-                         "start_date": False,
-                         "end_date":   False,
-                         "name":       False,
-                         }
+    expected_nullable = {
+        "id": False,
+        "start_date": False,
+        "end_date": False,
+        "name": False,
+    }
 
     for column in columns:
         column_name = column["name"]
-        assert column["nullable"] == expected_nullable.get(column_name), f"column {column_name} is not as null expected"
+        assert column["nullable"] == expected_nullable.get(
+            column_name
+        ), f"column {column_name} is not as null expected"
 
 
 def test_model_structure_column_constraints(db_inspector):
@@ -46,7 +49,10 @@ def test_model_structure_column_constraints(db_inspector):
     table = "seasonal_event"
     constraints = db_inspector.get_check_constraints(table)
 
-    assert any(constraint["name"] == "seasonal_event_name_length_check" for constraint in constraints)
+    assert any(
+        constraint["name"] == "seasonal_event_name_length_check"
+        for constraint in constraints
+    )
 
 
 def test_model_structure_unique_constraints(db_inspector):
@@ -56,7 +62,9 @@ def test_model_structure_unique_constraints(db_inspector):
     table = "seasonal_event"
     constraints = db_inspector.get_unique_constraints(table)
 
-    assert any(constraint["name"] == "uq_seasonal_event_name" for constraint in constraints)
+    assert any(
+        constraint["name"] == "uq_seasonal_event_name" for constraint in constraints
+    )
 
 
 def test_model_structure_column_lengths(db_inspector):

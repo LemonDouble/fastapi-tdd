@@ -42,15 +42,15 @@ def start_database_container():
         print(f"Container {container_name} does not exist.")
 
     container_config = {
-        "name":        container_name,
-        "image":       "postgres:16.1-alpine3.19",
-        "detach":      True,
-        "ports":       {"5432": "5433"},
+        "name": container_name,
+        "image": "postgres:16.1-alpine3.19",
+        "detach": True,
+        "ports": {"5432": "5433"},
         "environment": {
-            "POSTGRES_USER":     "postgres",
+            "POSTGRES_USER": "postgres",
             "POSTGRES_PASSWORD": "postgres",
         },
-        "volumes":     [f"{scripts_dir}:/docker-entrypoint-initdb.d"],
+        "volumes": [f"{scripts_dir}:/docker-entrypoint-initdb.d"],
     }
 
     container = client.containers.run(**container_config)

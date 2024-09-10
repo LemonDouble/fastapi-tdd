@@ -28,14 +28,16 @@ def test_model_structure_nullable_constraints(db_inspector):
     columns = db_inspector.get_columns(table)
 
     expected_nullable = {
-        "id":                 False,
+        "id": False,
         "attribute_value_id": False,
-        "product_line_id":    False,
+        "product_line_id": False,
     }
 
     for column in columns:
         column_name = column["name"]
-        assert column["nullable"] == expected_nullable.get(column_name), f"column {column_name} is not as null expected"
+        assert column["nullable"] == expected_nullable.get(
+            column_name
+        ), f"column {column_name} is not as null expected"
 
 
 def test_model_structure_unique_constraints(db_inspector):
@@ -45,7 +47,10 @@ def test_model_structure_unique_constraints(db_inspector):
     table = "product_line_attribute_value"
     constraints = db_inspector.get_unique_constraints(table)
 
-    assert any(constraint["name"] == "uq_product_line_attribute_value" for constraint in constraints)
+    assert any(
+        constraint["name"] == "uq_product_line_attribute_value"
+        for constraint in constraints
+    )
 
 
 def test_model_structure_foreign_key(db_inspector):
@@ -56,9 +61,17 @@ def test_model_structure_foreign_key(db_inspector):
     foreign_keys = db_inspector.get_foreign_keys(table)
 
     attribute_value_foreign_key = next(
-        (fk for fk in foreign_keys if fk["constrained_columns"] == ["attribute_value_id"]), None)
-    product_line_foreign_key = next((fk for fk in foreign_keys if fk["constrained_columns"] == ["product_line_id"]),
-                                    None)
+        (
+            fk
+            for fk in foreign_keys
+            if fk["constrained_columns"] == ["attribute_value_id"]
+        ),
+        None,
+    )
+    product_line_foreign_key = next(
+        (fk for fk in foreign_keys if fk["constrained_columns"] == ["product_line_id"]),
+        None,
+    )
 
     assert attribute_value_foreign_key is not None
     assert product_line_foreign_key is not None

@@ -36,23 +36,26 @@ def test_model_structure_nullable_constraints(db_inspector):
     table = "product"
     columns = db_inspector.get_columns(table)
 
-    expected_nullable = {"id":           False,
-                         "pid":          False,
-                         "name":         False,
-                         "slug":         False,
-                         "description":  True,
-                         "is_digital":   False,
-                         "created_at":   False,
-                         "updated_at":   False,
-                         "is_active":    False,
-                         "stock_status": False,
-                         "category_id":  False,
-                         "seasonal_id":  True,
-                         }
+    expected_nullable = {
+        "id": False,
+        "pid": False,
+        "name": False,
+        "slug": False,
+        "description": True,
+        "is_digital": False,
+        "created_at": False,
+        "updated_at": False,
+        "is_active": False,
+        "stock_status": False,
+        "category_id": False,
+        "seasonal_id": True,
+    }
 
     for column in columns:
         column_name = column["name"]
-        assert column["nullable"] == expected_nullable.get(column_name), f"column {column_name} is not as null expected"
+        assert column["nullable"] == expected_nullable.get(
+            column_name
+        ), f"column {column_name} is not as null expected"
 
 
 def test_model_structure_column_constraints(db_inspector):
@@ -62,8 +65,12 @@ def test_model_structure_column_constraints(db_inspector):
     table = "product"
     constraints = db_inspector.get_check_constraints(table)
 
-    assert any(constraint["name"] == "product_name_length_check" for constraint in constraints)
-    assert any(constraint["name"] == "product_slug_length_check" for constraint in constraints)
+    assert any(
+        constraint["name"] == "product_name_length_check" for constraint in constraints
+    )
+    assert any(
+        constraint["name"] == "product_slug_length_check" for constraint in constraints
+    )
 
 
 def test_model_structure_default_values(db_inspector):
@@ -109,8 +116,14 @@ def test_model_structure_foreign_key(db_inspector):
     table = "product"
     foreign_keys = db_inspector.get_foreign_keys(table)
 
-    category_foreign_key = next((fk for fk in foreign_keys if fk["constrained_columns"] == ["category_id"]), None)
-    seasonal_foreign_key = next((fk for fk in foreign_keys if fk["constrained_columns"] == ["seasonal_id"]), None)
+    category_foreign_key = next(
+        (fk for fk in foreign_keys if fk["constrained_columns"] == ["category_id"]),
+        None,
+    )
+    seasonal_foreign_key = next(
+        (fk for fk in foreign_keys if fk["constrained_columns"] == ["seasonal_id"]),
+        None,
+    )
 
     assert category_foreign_key is not None
     assert seasonal_foreign_key is not None

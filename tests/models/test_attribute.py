@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime, Integer, String
+from sqlalchemy import Integer, String
 
 
 def test_model_structure_table_exists(db_inspector):
@@ -27,14 +27,17 @@ def test_model_structure_nullable_constraints(db_inspector):
     table = "attribute"
     columns = db_inspector.get_columns(table)
 
-    expected_nullable = {"id":          False,
-                         "name":        False,
-                         "description": True,
-                         }
+    expected_nullable = {
+        "id": False,
+        "name": False,
+        "description": True,
+    }
 
     for column in columns:
         column_name = column["name"]
-        assert column["nullable"] == expected_nullable.get(column_name), f"column {column_name} is not as null expected"
+        assert column["nullable"] == expected_nullable.get(
+            column_name
+        ), f"column {column_name} is not as null expected"
 
 
 def test_model_structure_column_constraints(db_inspector):
@@ -44,7 +47,10 @@ def test_model_structure_column_constraints(db_inspector):
     table = "attribute"
     constraints = db_inspector.get_check_constraints(table)
 
-    assert any(constraint["name"] == "attribute_name_length_check" for constraint in constraints)
+    assert any(
+        constraint["name"] == "attribute_name_length_check"
+        for constraint in constraints
+    )
 
 
 def test_model_structure_unique_constraints(db_inspector):
