@@ -11,6 +11,50 @@ def mock_output(return_value=None):
     return lambda *args, **kwargs: return_value
 
 
+@pytest.mark.parametrize("category", [get_random_category_dict() for _ in range(3)])
+def test_unit_get_single_category_successful(client, monkeypatch, category):
+    """
+    카테고리 slug로 단일 조회 정상 동작 테스트
+    """
+    monkeypatch.setattr("sqlalchemy.orm.Query.first", mock_output(category))
+    response = client.get(f"api/category/slug/{category['slug']}")
+
+    assert response.status_code == 200
+    assert response.json() == category
+
+
+@pytest.mark.parametrize("category", [get_random_category_dict() for _ in range(3)])
+def test_unit_get_single_category_not_found(client, monkeypatch, category):
+    """
+    카테고리 slug로 단일 조회시 slug가 없는 경우, 404 not found 응답 테스트
+    """
+    monkeypatch.setattr("sqlalchemy.orm.Query.first", mock_output())
+    response = client.get(f"api/category/slug/{category['slug']}")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Category does not exist"}
+
+
+@pytest.mark.parametrize("category", [get_random_category_dict() for _ in range(3)])
+def test_unit_get_single_category_with_internal_server_error(
+    client, monkeypatch, category
+):
+    """
+    DB 에러 등으로 예상치 못한 에러 발생시, 정상적으로 에러 핸들링하는지 테스트
+    """
+
+    def mock_inquiry_single_category_exception(*args, **kwargs):
+        raise Exception("Internal Server Error")
+
+    monkeypatch.setattr(
+        "sqlalchemy.orm.Query.first", mock_inquiry_single_category_exception
+    )
+
+    response = client.get(f"api/category/slug/{category['slug']}")
+
+    assert response.status_code == 500
+
+
 def test_unit_get_all_categories_successful(client, monkeypatch):
     """
     카테고리 전체 조회 정상 동작 테스트
