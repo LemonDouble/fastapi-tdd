@@ -13,6 +13,22 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+@router.get("/slug/{category_slug}", response_model=CategoryReturn)
+def get_category_by_slug(category_slug: str, db: Session = Depends(get_db_session)):
+    try:
+        category = db.query(Category).filter(Category.slug == category_slug).first()
+        if category is None:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND, detail="Category does not exist"
+            )
+        return category
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"unexpected error occurred while creating category: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 @router.get("/", response_model=list[CategoryReturn])
 def get_categories(db: Session = Depends(get_db_session)):
     try:
