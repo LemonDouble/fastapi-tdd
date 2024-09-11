@@ -48,7 +48,7 @@ def test_unit_update_category_not_found(client, monkeypatch):
 
 def test_unit_update_category_internal_server_error(client, monkeypatch):
     """
-    카테고리 데이터 Update 404 not found (없는 경우) 테스트
+    DB 에러 등으로 예상치 못한 에러 발생시, 정상적으로 에러 핸들링하는지 테스트
     """
 
     def mock_update_category_exception(*args, **kwargs):
