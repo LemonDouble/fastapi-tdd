@@ -11,6 +11,53 @@ def mock_output(return_value=None):
     return lambda *args, **kwargs: return_value
 
 
+def test_unit_delete_category_successful(client, monkeypatch):
+    """
+    카테고리 데이터 Delete 정상 동작 테스트
+    """
+    category_dict = get_random_category_dict()
+    category_instance = Category(**category_dict)
+
+    monkeypatch.setattr("sqlalchemy.orm.Query.first", mock_output(category_instance))
+    monkeypatch.setattr("sqlalchemy.orm.Session.delete", mock_output())
+    monkeypatch.setattr("sqlalchemy.orm.Session.commit", mock_output())
+
+    response = client.delete("api/category/1")
+
+    expected_body = {"id": category_dict["id"], "name": category_dict["name"]}
+    assert response.status_code == 200
+    assert response.json() == expected_body
+
+
+def test_unit_delete_category_not_found(client, monkeypatch):
+    """
+    카테고리 데이터 Delete 404 not found (없는 경우) 테스트
+    """
+    monkeypatch.setattr("sqlalchemy.orm.Query.first", mock_output(None))
+    monkeypatch.setattr("sqlalchemy.orm.Session.commit", mock_output())
+
+    response = client.delete("api/category/1")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Category does not exist"}
+
+
+def test_unit_delete_category_internal_server_error(client, monkeypatch):
+    """
+    DB 에러 등으로 예상치 못한 에러 발생시, 정상적으로 에러 핸들링하는지 테스트
+    """
+
+    def mock_delete_category_exception(*args, **kwargs):
+        raise Exception("Internal Server Error")
+
+    monkeypatch.setattr("sqlalchemy.orm.Query.first", mock_delete_category_exception)
+
+    response = client.delete("api/category/1")
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Internal Server Error"}
+
+
 def test_unit_update_category_successful(client, monkeypatch):
     """
     카테고리 데이터 Update 정상 동작 테스트
