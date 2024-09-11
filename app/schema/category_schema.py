@@ -19,5 +19,10 @@ class CategoryUpdate(CategoryBase):
     pass
 
 
+class CategoryDeleteReturn(BaseModel):
+    id: int
+    name: Annotated[str, StringConstraints(min_length=1)]
+
+
 class CategoryReturn(CategoryBase):
     id: int

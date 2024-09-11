@@ -6,11 +6,41 @@ from sqlalchemy.orm import Session
 
 from app.db_connection import get_db_session
 from app.models import Category
-from app.schema.category_schema import CategoryReturn, CategoryCreate, CategoryUpdate
+from app.schema.category_schema import (
+    CategoryReturn,
+    CategoryCreate,
+    CategoryUpdate,
+    CategoryDeleteReturn,
+)
 from app.utils.category_utils import check_existing_category
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+
+@router.delete("/{category_id}", response_model=CategoryDeleteReturn)
+def delete_category(
+    category_id: int,
+    db: Session = Depends(get_db_session),
+):
+    try:
+        category: Category = (
+            db.query(Category).filter(Category.id == category_id).first()
+        )
+        if category is None:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND, detail="Category does not exist"
+            )
+        db.delete(category)
+        db.commit()
+        return category
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"unexpected error occurred while deleting category: {e}")
+
+        logger.error(f"unexpected error occurred while deleting category: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @router.put(
