@@ -11,6 +11,60 @@ def mock_output(return_value=None):
     return lambda *args, **kwargs: return_value
 
 
+def test_unit_update_category_successful(client, monkeypatch):
+    """
+    카테고리 데이터 Update 정상 동작 테스트
+    """
+    category_dict = get_random_category_dict()
+    category_instance = Category(**category_dict)
+
+    monkeypatch.setattr("sqlalchemy.orm.Query.first", mock_output(category_instance))
+    monkeypatch.setattr("sqlalchemy.orm.Session.commit", mock_output())
+    monkeypatch.setattr("sqlalchemy.orm.Session.refresh", mock_output())
+
+    body = category_dict.copy()
+    response = client.put("api/category/1", json=body)
+
+    assert response.status_code == 201
+    assert response.json() == category_dict
+
+
+def test_unit_update_category_not_found(client, monkeypatch):
+    """
+    카테고리 데이터 Update 404 not found (없는 경우) 테스트
+    """
+    category_dict = get_random_category_dict()
+
+    monkeypatch.setattr("sqlalchemy.orm.Query.first", mock_output())
+    monkeypatch.setattr("sqlalchemy.orm.Session.commit", mock_output())
+    monkeypatch.setattr("sqlalchemy.orm.Session.refresh", mock_output())
+
+    body = category_dict.copy()
+    response = client.put("api/category/1", json=body)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Category does not exist"}
+
+
+def test_unit_update_category_internal_server_error(client, monkeypatch):
+    """
+    카테고리 데이터 Update 404 not found (없는 경우) 테스트
+    """
+
+    def mock_update_category_exception(*args, **kwargs):
+        raise Exception("Internal Server Error")
+
+    category_dict = get_random_category_dict()
+
+    monkeypatch.setattr("sqlalchemy.orm.Query.first", mock_update_category_exception)
+
+    body = category_dict.copy()
+    response = client.put("api/category/1", json=body)
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Internal Server Error"}
+
+
 @pytest.mark.parametrize("category", [get_random_category_dict() for _ in range(3)])
 def test_unit_get_single_category_successful(client, monkeypatch, category):
     """
