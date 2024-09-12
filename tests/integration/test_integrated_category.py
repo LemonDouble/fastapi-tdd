@@ -88,3 +88,22 @@ def test_integrate_update_category_successful(client, db_session_integration):
     assert updated_category.slug == updated_category_data["slug"]
     assert updated_category.is_active == updated_category_data["is_active"]
     assert updated_category.level == updated_category_data["level"]
+
+
+def test_integrate_delete_category_successful(client, db_session_integration):
+    category_data = get_random_category_dict()
+    new_category = Category(**category_data)
+    db_session_integration.add(new_category)
+    db_session_integration.commit()
+
+    response = client.delete(f"api/category/{new_category.id}")
+
+    assert response.status_code == 200
+    assert response.json()["id"] == new_category.id
+    assert response.json()["name"] == new_category.name
+
+    deleted_category = (
+        db_session_integration.query(Category).filter_by(id=new_category.id).first()
+    )
+
+    assert deleted_category is None
