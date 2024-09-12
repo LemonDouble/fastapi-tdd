@@ -27,3 +27,15 @@ def test_integrate_create_new_category_successful(client, db_session_integration
         column.name: getattr(created_category, column.name)
         for column in created_category.__table__.columns
     }
+
+
+def test_integrate_create_new_category_duplicated(client, db_session_integration):
+    category_data = get_random_category_dict()
+    new_category = Category(**category_data)
+    db_session_integration.add(new_category)
+    db_session_integration.commit()
+
+    category_data.pop("id")
+    response = client.post("api/category/", json=category_data)
+
+    assert response.status_code == 400
